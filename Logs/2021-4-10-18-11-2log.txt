@@ -1,0 +1,8 @@
+
+ El archivo enviado fue: Archivo100M
+ El tamaño del archivo es: 100MB
+ La entrega fue exitosa
+ El cliente al que fue enviado el archivo: ('127.0.0.1', 61635)
+ El peso total transferido fue: 104857600.0
+ La cantidad de paquetes transferida fue: 25600
+ El tiempo de transferencia fue: 1.8113243579864502 seg
