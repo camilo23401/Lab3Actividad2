@@ -7,7 +7,7 @@ import hashlib
 import sys
 from datetime import datetime
 from time import time
-
+import time as t
 archivo = input(" 1.Enviar a clientes archivo de 100M    \n 2.Enviar a clientes archivo de 250M    ")
 numCliente = input(" A cuantos clientes desea transmitir en simúltaneo?   ")
 nomArchivo = ""
@@ -65,7 +65,7 @@ def conexionServ():
     sock.bind((host, port))
     print("Socket bind completado con host " + str(host) + " y puerto " + str(port))
 
-    sock2.bind((host, port2))
+    sock2.bind(("127.0.0.1", 20001))
     print("Socket_2 bind completado con host " + str(host) + " y puerto " + str(port2))
 
     # Establecemos un *timeout*
@@ -78,6 +78,13 @@ def conexionServ():
     cambiarRuta(archivo)
 
     while True & numeroConectados<=int(numCliente):
+    # while True:
+        bytesAdressPair= sock2.recvfrom(1024)
+        message=bytesAdressPair[0]
+        adress=bytesAdressPair[1]
+        print(str(adress)+'udp---------------')
+        print(message.decode('utf-8'))
+
         # Se establece la conexion con el cliente
         connection, client_address = sock.accept()
         connection.recv(4096)
@@ -86,7 +93,7 @@ def conexionServ():
 
         #connection2, client_address = sock2.accept()
 
-        #if numeroConectados == int(numCliente):
+        # if numeroConectados == int(numCliente):
         while numeroConectados != int(numCliente):
             print("Esperando clientes...")
 
@@ -110,12 +117,12 @@ def conexionServ():
         print("Se envió el HASH al cliente")
 
         data = open(ruta, encoding='utf-8')
-        dr = data.read(4096)
+        dr = data.read(1024)
         while len(dr) > 0:
-            serv = ('127.0.0.1', port2)
-            sock2.sendto(dr.encode('utf-8'),serv)
-            print("Enviando paquete")
-            dr = data.read(4096)
+            sock2.sendto(dr.encode('utf-8'),adress)
+            print("Enviando paquete UDP"+str(cant_paquetes))
+            # t.sleep(0.02)
+            dr = data.read(1024)
             cant_paquetes = cant_paquetes + 1
         print("Todos los paquetes fueron enviados")
         peso_tot=peso_tot+float(os.path.getsize(ruta))

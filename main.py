@@ -10,7 +10,7 @@ from time import time
 import sys
 
 aux = 0
-NUM_HILOS = 25
+NUM_HILOS = 1
 def conexion():
     global aux
     global NUM_HILOS
@@ -24,10 +24,13 @@ def conexion():
     path_logs = "./Logs"
 
     BLOCK_SIZE = 65536
-    conexiones = NUM_HILOS
+    conexiones = 1
     obj = socket.socket()
     obj2 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    obj2.bind((host,port2))
+
+    # obj2.bind((host,port2))
+    bytesToSend = str.encode('msgFromClient')
+    obj2.sendto(bytesToSend,("127.0.0.1", 20001))
 
     try:
         obj.connect((host, port))
@@ -35,7 +38,6 @@ def conexion():
         print("Cliente " + cliente + " conectado al servidor")
         print("Cliente " + cliente + " listo para recibir...")
 
-        obj2.connect((host,port2))
 
         year = datetime.now().year
         mes = datetime.now().month
@@ -59,11 +61,12 @@ def conexion():
             nombre_archivo = cliente + "-Prueba-" + str(conexiones) +".txt"
             archivoPorEscribir = os.path.join(path_archivos, nombre_archivo)
             file1 = open(archivoPorEscribir, "wb")
-            recibido = obj2.recvfrom(4096)
-            while len(recibido) > 0:
-                print("Recibiendo paquete")
-                file1.write(recibido)
-                recibido = obj2.recvfrom(4096)
+            recibido = obj2.recvfrom(1024)
+            print(recibido[0].decode())
+            while len(recibido)>0:
+                print("Recibiendo paquete"+str(cant_paquetes))
+                file1.write(recibido[0])
+                recibido = obj2.recvfrom(1024)
                 cant_paquetes = cant_paquetes + 1
             print("Terminó la recepción de paquetes. Se recibió un archivo completo")
             file1.close()
