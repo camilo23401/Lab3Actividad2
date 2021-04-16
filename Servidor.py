@@ -47,7 +47,7 @@ def conexionServ():
     # Se define el puerto
     port = 6666+aux
     port2 = 5005+aux
-    aux +=1
+    aux += 1
     path_log = "./Logs"
     year = datetime.now().year
     mes = datetime.now().month
@@ -120,10 +120,11 @@ def conexionServ():
         dr = data.read(1024)
         while len(dr) > 0:
             sock2.sendto(dr.encode('utf-8'),adress)
-            print("Enviando paquete UDP"+str(cant_paquetes))
-            # t.sleep(0.02)
+            print("Enviando paquete UDP "+str(cant_paquetes))
+            #t.sleep(0.0002)
             dr = data.read(1024)
             cant_paquetes = cant_paquetes + 1
+        sock2.sendto( 'termino'.encode('utf-8'),adress)
         print("Todos los paquetes fueron enviados")
         peso_tot=peso_tot+float(os.path.getsize(ruta))
         file.write("\n El archivo enviado fue: "+ nomArchivo )

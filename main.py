@@ -31,6 +31,7 @@ def conexion():
     # obj2.bind((host,port2))
     bytesToSend = str.encode('msgFromClient')
     obj2.sendto(bytesToSend,("127.0.0.1", 20001))
+    obj2.settimeout(20)
 
     try:
         obj.connect((host, port))
@@ -63,11 +64,13 @@ def conexion():
             file1 = open(archivoPorEscribir, "wb")
             recibido = obj2.recvfrom(1024)
             print(recibido[0].decode())
-            while len(recibido)>0:
+            while recibido[0].decode() != 'termino':
                 print("Recibiendo paquete"+str(cant_paquetes))
                 file1.write(recibido[0])
                 recibido = obj2.recvfrom(1024)
                 cant_paquetes = cant_paquetes + 1
+                #if recibido == b'':
+                    #raise RuntimeError('Socket conn broken')
             print("Terminó la recepción de paquetes. Se recibió un archivo completo")
             file1.close()
             dataHash = open(archivoPorEscribir)
@@ -82,7 +85,7 @@ def conexion():
             directory_path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
             ruta = os.path.join(directory_path, "ArchivosRecibidos/" + nombre_archivo)
             data = open(ruta, encoding='utf-8')
-            print("Verificando integridad")
+            print("Verificando integridad...")
             hash = hashlib.sha256()
             fb = data.read(65536)
             while len(fb) > 0:
@@ -91,9 +94,9 @@ def conexion():
             resultadoHash = hash.hexdigest()
 
             if (resultadoHash == serverHash.decode('utf-8')):
-                print("Integridad confirmada")
+                print("Resultado: Integridad confirmada")
             else:
-                print("Falla de integridad")
+                print("Resultado: Falla de integridad")
                 print("Enviado por el servidor:")
                 print((serverHash.decode('utf-8')))
                 print("Recuperado por el cliente:")
