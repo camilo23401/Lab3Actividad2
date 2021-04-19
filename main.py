@@ -10,7 +10,7 @@ from time import time
 import sys
 
 aux = 0
-NUM_HILOS = 25
+NUM_HILOS = 1
 def conexion():
     global aux
     global NUM_HILOS
@@ -24,10 +24,14 @@ def conexion():
     path_logs = "./Logs"
 
     BLOCK_SIZE = 65536
-    conexiones = NUM_HILOS
+    conexiones = 1
     obj = socket.socket()
     obj2 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    obj2.bind((host,port2))
+
+    # obj2.bind((host,port2))
+    bytesToSend = str.encode('msgFromClient')
+    obj2.sendto(bytesToSend,(host, port2))
+    obj2.settimeout(20)
 
     try:
         obj.connect((host, port))
@@ -35,7 +39,6 @@ def conexion():
         print("Cliente " + cliente + " conectado al servidor")
         print("Cliente " + cliente + " listo para recibir...")
 
-        obj2.connect((host,port2))
 
         year = datetime.now().year
         mes = datetime.now().month
@@ -59,12 +62,15 @@ def conexion():
             nombre_archivo = cliente + "-Prueba-" + str(conexiones) +".txt"
             archivoPorEscribir = os.path.join(path_archivos, nombre_archivo)
             file1 = open(archivoPorEscribir, "wb")
-            recibido = obj2.recvfrom(4096)
-            while len(recibido) > 0:
-                print("Recibiendo paquete")
-                file1.write(recibido)
-                recibido = obj2.recvfrom(4096)
+            recibido = obj2.recvfrom(512)
+            print(recibido[0].decode())
+            while recibido[0].decode() != 'termino':
+                print("Recibiendo paquete..."+str(cant_paquetes))
+                file1.write(recibido[0])
+                recibido = obj2.recvfrom(512)
                 cant_paquetes = cant_paquetes + 1
+                #if recibido == b'':
+                    #raise RuntimeError('Socket conn broken')
             print("Terminó la recepción de paquetes. Se recibió un archivo completo")
             file1.close()
             dataHash = open(archivoPorEscribir)
@@ -79,7 +85,7 @@ def conexion():
             directory_path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
             ruta = os.path.join(directory_path, "ArchivosRecibidos/" + nombre_archivo)
             data = open(ruta, encoding='utf-8')
-            print("Verificando integridad")
+            print("Verificando integridad...")
             hash = hashlib.sha256()
             fb = data.read(65536)
             while len(fb) > 0:
@@ -88,9 +94,9 @@ def conexion():
             resultadoHash = hash.hexdigest()
 
             if (resultadoHash == serverHash.decode('utf-8')):
-                print("Integridad confirmada")
+                print("Resultado: Integridad confirmada")
             else:
-                print("Falla de integridad")
+                print("Resultado: Falla de integridad")
                 print("Enviado por el servidor:")
                 print((serverHash.decode('utf-8')))
                 print("Recuperado por el cliente:")
