@@ -30,7 +30,7 @@ def conexion():
 
     # obj2.bind((host,port2))
     bytesToSend = str.encode('msgFromClient')
-    obj2.sendto(bytesToSend,("127.0.0.1", 20001))
+    obj2.sendto(bytesToSend,(host, port2))
     obj2.settimeout(20)
 
     try:
@@ -62,12 +62,12 @@ def conexion():
             nombre_archivo = cliente + "-Prueba-" + str(conexiones) +".txt"
             archivoPorEscribir = os.path.join(path_archivos, nombre_archivo)
             file1 = open(archivoPorEscribir, "wb")
-            recibido = obj2.recvfrom(1024)
+            recibido = obj2.recvfrom(512)
             print(recibido[0].decode())
             while recibido[0].decode() != 'termino':
-                print("Recibiendo paquete"+str(cant_paquetes))
+                print("Recibiendo paquete..."+str(cant_paquetes))
                 file1.write(recibido[0])
-                recibido = obj2.recvfrom(1024)
+                recibido = obj2.recvfrom(512)
                 cant_paquetes = cant_paquetes + 1
                 #if recibido == b'':
                     #raise RuntimeError('Socket conn broken')

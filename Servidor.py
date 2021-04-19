@@ -65,7 +65,7 @@ def conexionServ():
     sock.bind((host, port))
     print("Socket bind completado con host " + str(host) + " y puerto " + str(port))
 
-    sock2.bind(("127.0.0.1", 20001))
+    sock2.bind((host, port2))
     print("Socket_2 bind completado con host " + str(host) + " y puerto " + str(port2))
 
     # Establecemos un *timeout*
@@ -79,7 +79,7 @@ def conexionServ():
 
     while True & numeroConectados<=int(numCliente):
     # while True:
-        bytesAdressPair= sock2.recvfrom(1024)
+        bytesAdressPair= sock2.recvfrom(512)
         message=bytesAdressPair[0]
         adress=bytesAdressPair[1]
         print(str(adress)+'udp---------------')
@@ -87,7 +87,7 @@ def conexionServ():
 
         # Se establece la conexion con el cliente
         connection, client_address = sock.accept()
-        connection.recv(4096)
+        connection.recv(512)
         print ('Conexion obtenida de ', client_address)
         numeroConectados+=1
 
@@ -117,12 +117,12 @@ def conexionServ():
         print("Se envió el HASH al cliente")
 
         data = open(ruta, encoding='utf-8')
-        dr = data.read(1024)
+        dr = data.read(512)
         while len(dr) > 0:
             sock2.sendto(dr.encode('utf-8'),adress)
-            print("Enviando paquete UDP "+str(cant_paquetes))
+            print("Enviando paquete UDP..."+str(cant_paquetes))
             #t.sleep(0.0002)
-            dr = data.read(1024)
+            dr = data.read(512)
             cant_paquetes = cant_paquetes + 1
         sock2.sendto( 'termino'.encode('utf-8'),adress)
         print("Todos los paquetes fueron enviados")
